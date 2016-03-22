@@ -20,6 +20,8 @@ ISI = 16
 NOF.ITEMS = 13
 
 ## Wczytujemy słowa z bazy i przygotowujemy zestaw bodźców
+ct = function(x)x - mean(x, na.rm = TRUE)
+st = function(x)ct(x) / sd(x, na.rm = TRUE)
 words = readRDS('nawl.rds')
 words = words[words$Gram == 3,]
 words$val = st(words$val_M_all)
