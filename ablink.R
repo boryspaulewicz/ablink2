@@ -9,12 +9,12 @@
 ## grant.sonata/pilot/memtrain
 
 library(stringr)
-source('~/cs/code/r/tasks/task/task.R')
+if(!interactive())source('~/cs/code/r/tasks/task/task.R')
 ## db.connect('task')
 TASK.NAME <<- 'ablink'
 
 FIXATION.TIME = 1000
-POST.FIXATION.TIME = 500
+POST.FIXATION.TIME = 1000
 PRESENTATION.TIME = 96
 ISI = 16
 NOF.ITEMS = 13
