@@ -9,7 +9,7 @@
 ## grant.sonata/pilot/memtrain
 
 library(stringr)
-if(!interactive())source('~/cs/code/r/tasks/task/task.R')
+if(interactive())source('~/cs/code/r/tasks/task/task.R')
 ## db.connect('task')
 TASK.NAME <<- 'ablink'
 
