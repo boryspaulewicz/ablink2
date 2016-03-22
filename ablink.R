@@ -168,7 +168,7 @@ Dwa spośród tych słów są zielone.
 Zadanie to polega na napisaniu, po każdej próbie, jakie było pierwsze i jakie było drugie
 słowo w kolorze zielonym.")
 
-run.trials(trial.code, expand.grid(t1em = c('neg', 'neu', 'pos'), t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5), condition = 'default')
+run.trials(trial.code, record.session = T, expand.grid(t1em = c('neg', 'neu', 'pos'), t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5), condition = 'default')
 
 ## Dalszy etap procedury
 download.run.task("mcmtest")
