@@ -33,7 +33,7 @@ words = words[words$Gram == 3,]
 words$val = st(words$val_M_all)
 
 ## neg = words$NAWL_word[words$val < -1]
-neg = words$NAWL_word[words$val < -1.5]
+neg = words$NAWL_word[words$val < -1.3]
 neg.len = str_length(neg)
 neg = neg[neg.len <= 6]
 
@@ -43,7 +43,7 @@ neu.len = str_length(neu)
 neu = neu[neu.len <= 6]
 
 ## pos = words$NAWL_word[words$val > 1]
-pos = words$NAWL_word[words$val > 1.5]
+pos = words$NAWL_word[words$val > 1.2]
 pos.len = str_length(pos)
 pos = pos[pos.len <= 6]
 
