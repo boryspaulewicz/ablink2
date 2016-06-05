@@ -333,6 +333,7 @@ run.trials(trial.code, record.session = T, expand.grid(t1em = c('neg
 ## Zapisujemy dane kwestionariuszowe
 if(USER.DATA$name != 'admin'){
     ## Zapamiętujemy dane kwestionariuszowe
+    db.connect()
     panas = as.list(panas)
     names(panas) = paste('i', 1:length(panas), sep = '')
     db.create.data.table(panas, 'ablink_panas')
@@ -362,6 +363,7 @@ if(USER.DATA$name != 'admin'){
     db.create.data.table(wydarzenia, 'ablink_wydarzenia')
     wydarzenia$session_id = SESSION.ID
     db.insert.data(wydarzenia, 'ablink_wydarzenia')
+    db.disconnect()
 }
 
 
