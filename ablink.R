@@ -1,3 +1,6 @@
+##! TODO Liczba prób, sprawdzone słowa, sprawdzić, czy wszystkie słowa
+##się pojawiają, czy nie ma NA.
+
 ## Procedura: attentional blink a potem pamięciowe, w pamięciowym po
 ## 10 słów w każdej kategori (neg, neu, poz)
 
@@ -32,26 +35,17 @@ words = readRDS('nawl.rds')
 words = words[words$Gram == 3,]
 words$val = st(words$val_M_all)
 
-## neg = words$NAWL_word[words$val < -1]
-neg = words$NAWL_word[words$val < -1.3]
-neg.len = str_length(neg)
-neg = neg[neg.len <= 6]
-
-## Tylko według kryterium .5 wychodzi 27 słów neutralnych - tyle ich potrzeba dla T2
+## Tylko według kryterium .5 wychodzi dokładnie 27 słów neutralnych - tyle ich potrzeba dla T2
 neu = words$NAWL_word[abs(words$val) < .5]
 neu.len = str_length(neu)
 neu = neu[neu.len <= 6]
 
-## pos = words$NAWL_word[words$val > 1]
-pos = words$NAWL_word[words$val > 1.2]
-pos.len = str_length(pos)
-pos = pos[pos.len <= 6]
-
+## Dystraktory
 dis = words$NAWL_word[abs(words$val) < .5]
 dis.len = str_length(dis)
 dis = (dis[dis.len >= 9])[1:79]
 
-rm(words)
+words = read.csv('short_words.csv', header = T)
 
 ## df = data.frame(item = 1:max(length(neg), length(neu), length(pos), length(dis)))
 ## df$neg = df$neu = df$pos = df$dis = ""
@@ -66,17 +60,18 @@ WINDOW$set.mouse.cursor.visible(T)
 
 FX = fixation(WINDOW, size = .02)
 
+WORDS.I = list()
+INDICES = list()
 trial.code = function(trial, t1em = sample(c('neg', 'neu', 'pos'), 1), t1pos = sample(3:5, 1), t2lag = sample(c(2, 4, 6), 1), i = 1){
     ## Kod specyficzny dla zadania
     ## ...
     ## Szablon
     t2pos = t1pos + t2lag
-    ## Mieszamy
-    neg = sample(neg)
-    neu = sample(neu)
-    pos = sample(pos)
-    dis = sample(dis)
+    t1em = as.character(t1em)
     if(trial == 1){
+        ## Słowa losowane z minimalizacją powtórzeń
+        WORDS.I <<- list(neg = scen(9, 1, 5), neu = scen(9, 1, 5), neg = scen(9, 1, 5), t2 = scen(27, 1, 5), dis = scen(79, 1, 100))
+        INDICES <<- list(neg = 1, neu = 1, pos = 1, t2 = 1, dis = 1)
         state = 'press-space'
     }else{ state = 'show-fixation' }
     if(WINDOW$is.open())process.inputs()
@@ -123,11 +118,14 @@ trial.code = function(trial, t1em = sample(c('neg', 'neu', 'pos'), 1), t1pos = s
             }
             ## Pierwszy target ma kontrolowaną walencję
             if(item == t1pos){
-                t1stim = stim = list(neg = neg, neu = neu, pos = pos)[[t1em]][item]
+                t1stim = stim = as.character(words[[t1em]][WORDS.I[[t1em]][INDICES[[t1em]]]])
+                INDICES[[t1em]] <<- INDICES[[t1em]] + 1
             }else if(item == t2pos){
-                t2stim = stim = neu[item]
+                t2stim = stim = neu[WORDS.I$t2[INDICES$t2]]
+                INDICES$t2 <<- INDICES$t2 + 1
             }else{
-                stim = dis[item]
+                stim = dis[WORDS.I$dis[INDICES$dis]]
+                INDICES$dis <<- INDICES$dis + 1
             }
             TXT$set.string(stim)
             bounds = TXT$get.local.bounds()
@@ -326,9 +324,11 @@ wydarzenia = gui.quest(c('Poważna kłótnia/konflikt w rodzinie',
 
 gui.show.instruction("Teraz rozpocznie się zadanie wykrywania słów innego koloru. Zadanie to składa się z serii prób, w trakcie których na ekranie komputera prezentowane są szybko, jedno po drugim, różne słowa. Większość prezentowanych słów ma kolor biały. Dwa spośród tych słów są zielone. Zadanie to polega na napisaniu, po każdej próbie, jakie było pierwsze i jakie było drugie słowo w kolorze zielonym.")
 
-run.trials(trial.code, record.session = T, expand.grid(t1em = c('neg
-', 'neu', 'pos
-'), t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5), condition = 'default')
+## i = 1:5, żeby liczba prób zgadzała się z procedurą Kostera
+run.trials(trial.code, record.session = T,
+           expand.grid(t1em = c('neg', 'neu', 'pos'),
+                       t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5),
+           condition = 'default')
 
 ## Zapisujemy dane kwestionariuszowe
 if(USER.DATA$name != 'admin'){
