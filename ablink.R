@@ -46,6 +46,7 @@ dis.len = str_length(dis)
 dis = (dis[dis.len >= 9])[1:79]
 
 words = read.csv('short_words.csv', header = T)
+names(words)[3] = 'pos'
 
 ## df = data.frame(item = 1:max(length(neg), length(neu), length(pos), length(dis)))
 ## df$neg = df$neu = df$pos = df$dis = ""
@@ -70,7 +71,7 @@ trial.code = function(trial, t1em = sample(c('neg', 'neu', 'pos'), 1), t1pos = s
     t1em = as.character(t1em)
     if(trial == 1){
         ## Słowa losowane z minimalizacją powtórzeń
-        WORDS.I <<- list(neg = scen(9, 1, 5), neu = scen(9, 1, 5), neg = scen(9, 1, 5), t2 = scen(27, 1, 5), dis = scen(79, 1, 100))
+        WORDS.I <<- list(neg = scen(9, 1, 5), neu = scen(9, 1, 5), pos = scen(9, 1, 5), t2 = scen(27, 1, 5), dis = scen(79, 1, 100))
         INDICES <<- list(neg = 1, neu = 1, pos = 1, t2 = 1, dis = 1)
         state = 'press-space'
     }else{ state = 'show-fixation' }
