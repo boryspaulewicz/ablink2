@@ -167,7 +167,7 @@ trial.code = function(trial, t1em = sample(c('neg', 'neu', 'pos'), 1), t1pos = s
 
 gui.show.instruction("W czasie eksperymentu obowiązuje cisza. Proszę wyłączyć telefon komórkowy. W razie jakichkolwiek wątpliwości proszę nie wołać osoby prowadzącej, tylko podnieść do góry rękę. Osoba prowadząca podejdzie w dogodnym momencie i postara się udzielić wszelkich wyjaśnień. Badanie jest anonimowe.
 
-Za chwilę trzeba będzie wpisać dane osobowe: wiek, płeć oraz pseudonim. Pseudonim składa się z inicjałów (małymi literami) oraz czterech cyfr: dnia i miesiąca urodzenia (np.  ms0706).")
+Za chwilę trzeba będzie wpisać dane osobowe: wiek, płeć oraz pseudonim. Pseudonim składa się z inicjałów (małymi literami, ale bez polskich znaków) oraz czterech cyfr: dnia i miesiąca urodzenia (np.  ms0706).")
 gui.user.data()
 
 if(USER.DATA$name != 'admin'){
@@ -370,4 +370,7 @@ if(USER.DATA$name != 'admin'){
 
 ## Dalszy etap procedury
 download.run.task("mcmtest")
+
+gui.show.instruction("Dziękujemy, to już koniec eksperymentu. Prosimy pozostać na miejscu i zaczekać, aż osoba prowadząca badanie poinformuje o dalszym postępowaniu.")
+
 if(!interactive())quit("no")
