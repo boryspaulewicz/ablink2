@@ -165,176 +165,166 @@ trial.code = function(trial, t1em = sample(c('neg', 'neu', 'pos'), 1), t1pos = s
     }
 }
 
+######################################################################
+## Dane osobowe
+
 gui.show.instruction("W czasie eksperymentu obowiązuje cisza. Proszę wyłączyć telefon komórkowy. W razie jakichkolwiek wątpliwości proszę nie wołać osoby prowadzącej, tylko podnieść do góry rękę. Osoba prowadząca podejdzie w dogodnym momencie i postara się udzielić wszelkich wyjaśnień. Badanie jest anonimowe.
 
 Za chwilę trzeba będzie wpisać dane osobowe: wiek, płeć oraz pseudonim. Pseudonim składa się z inicjałów (małymi literami, ale bez polskich znaków) oraz czterech cyfr: dnia i miesiąca urodzenia (np.  ms0706).")
+
 gui.user.data()
 
-if(USER.DATA$name != 'admin'){
-gui.show.instruction("Teraz rozpocznie się etap polegający na wypełnieniu kilku kwestionariuszy. W każdym z kwestionariuszy prosimy zapoznać się z instrukcją.")
+######################################################################
+## KWESTIONARIUSZE
 
-## PANAS-C
+## Przechodzimy przez kwestionariusze tylko, jeżeli wcześniej dana
+## osoba tego jeszcze nie robiła w tym zadaniu.
+db.connect()
+res = db.query.csv(sprintf('SELECT * FROM session WHERE name = "%s" AND task = "%s" AND cnd = "questionnaire" AND stage = "finished" AND age = %d;',
+                           USER.DATA$name, TASK.NAME, USER.DATA$age))
+if((dim(res) == 0) & (USER.DATA$name != 'admin')){
+    db.register.session(condition = 'questionnaire')
+    gui.show.instruction("Teraz rozpocznie się etap polegający na wypełnieniu kilku kwestionariuszy. W każdym z kwestionariuszy prosimy zapoznać się z instrukcją.")
 
-gui.show.instruction('Skala, która się za chwilę pojawi, składa się ze słów nazywających różne emocje i uczucia. Przeczytaj każde słowo i zastanów się jak się czujesz ZAZWYCZAJ.')
+    ## PANAS-C
+    gui.show.instruction('Skala, która się za chwilę pojawi, składa się ze słów nazywających różne emocje i uczucia. Przeczytaj każde słowo i zastanów się jak się czujesz ZAZWYCZAJ.')
+    panas = gui.quest(c('aktywny(a)', '"jak na szpilkach"', 'mocny(a)', 'nerwowy(a)', 'ożywiony(a)', 'pełen (pełna) zapału', 'przerażony(a)', 'raźny(a)', 'silny(a)', 'winny(a)',
+        'wystraszony(a)', 'zalękniony(a)', 'zaniepokojony(a)', 'zapalony(a)', 'zawstydzony(a)', 'zdecydowany(a)', 'zdenerwowany(a)', 'zmartwiony(a)', 'żwawy(a)', 'żywy(a)'),
+        c('nieznacznie lub wcale', 'trochę', 'umiarkowanie', 'dość mocno', 'bardzo silnie'))
 
-panas = gui.quest(c('aktywny(a)', '"jak na szpilkach"', 'mocny(a)', 'nerwowy(a)', 'ożywiony(a)', 'pełen (pełna) zapału', 'przerażony(a)', 'raźny(a)', 'silny(a)', 'winny(a)',
-            'wystraszony(a)', 'zalękniony(a)', 'zaniepokojony(a)', 'zapalony(a)', 'zawstydzony(a)', 'zdecydowany(a)', 'zdenerwowany(a)', 'zmartwiony(a)', 'żwawy(a)', 'żywy(a)'),
-          c('nieznacznie lub wcale', 'trochę', 'umiarkowanie', 'dość mocno', 'bardzo silnie'))
-
-## Ruminacje
-
-gui.show.instruction(
-    'Za chwilę pojawi się oto opis szeregu myśli i uczuć, jakimi ludzie reagują na różne sytuacje i zdarzenia. Prosimy zaznaczyć jak często Pana/Panią nachodzi każda z tych myśli lub uczuć - niezależnie od tego, czy same zdarzenia wywołujące te myśli są rzadkie czy częste: interesuje nas częstość samych myśli lub uczuć, a nie częstość zdarzeń, które je wywołują.
+    ## Ruminacje
+    gui.show.instruction(
+        'Za chwilę pojawi się oto opis szeregu myśli i uczuć, jakimi ludzie reagują na różne sytuacje i zdarzenia. Prosimy zaznaczyć jak często Pana/Panią nachodzi każda z tych myśli lub uczuć - niezależnie od tego, czy same zdarzenia wywołujące te myśli są rzadkie czy częste: interesuje nas częstość samych myśli lub uczuć, a nie częstość zdarzeń, które je wywołują.
 ')
-
-ruminacje = gui.quest(c(
-
-    'Nie mogę uwolnić się od myśli o różnych niegodziwościach naszego świata.
+    ruminacje = gui.quest(c(
+        'Nie mogę uwolnić się od myśli o różnych niegodziwościach naszego świata.
 ',
-'Wyrzucam sobie nieodpowiedni sposób postępowania w przeszłości.',
-'Obawiam się, że świat podąża w coraz gorszym kierunku.',
-'"Odtwarzam" sobie myślach własny sposób postępowania w przeszłości.',
-'Myślę o zdarzeniach z przeszłości, których bieg chciałbym odmienić.',
-'Myślę o tym, jak wiele jest na świecie cierpień niewinnych ludzi.',
-'Boli mnie, gdy niektórzy dostają w życiu coś, na co zupełnie sobie nie zasłużyli.',
-'Boli mnie, że tak wiele niegodziwych ludzi nigdy nie zostaje ukaranych.',
-'Obracam na różne strony w swojej głowie to, co niedawno zrobiłem lub powiedziałem.',
-'Smuci mnie, że ludzie myślą tylko o własnym interesie.',
-'Boleję nad tym, jakimi egoistami jest większość ludzi.',
-'Zastanawiam się dlaczego nie postąpiłem inaczej w pewnych sytuacjach.',
-'Boli mnie myśl o tym, że nieuczciwi ludzie się bogacą.',
-'Wyobrażam sobie co by było, gdybym inaczej się zachował w pewnych sytuacjach.',
-'Myślę o tym, jaki niesprawiedliwy jest świat.',
-'Na nowo przeżywam rozczarowania z przeszłości.',
-'Powracam myślami do własnych postępków, których już nie można zmienić.',
-'Gnębi mnie myśl, jak wiele podłości jest na świecie.',
-'Trudno mi zaprzestać myślenia o rzeczach, które mi się nie udały. ',
-'Trudno mi opędzić się od myśli, że w pewnych sytuacjach mogłem postąpić inaczej.'),
-c('nigdy', 'rzadko', 'czasami', 'często', 'bardzo często'))
-
-## CES-D
-
-gui.show.instruction(
-    'Proszę zaznaczyć stwierdzenie, które najlepiej opisuje jak często czuł(a) się Pan/Pani lub zachowywał(a) w ten sposób w ciągu ostatniego tygodnia.
+        'Wyrzucam sobie nieodpowiedni sposób postępowania w przeszłości.',
+        'Obawiam się, że świat podąża w coraz gorszym kierunku.',
+        '"Odtwarzam" sobie myślach własny sposób postępowania w przeszłości.',
+        'Myślę o zdarzeniach z przeszłości, których bieg chciałbym odmienić.',
+        'Myślę o tym, jak wiele jest na świecie cierpień niewinnych ludzi.',
+        'Boli mnie, gdy niektórzy dostają w życiu coś, na co zupełnie sobie nie zasłużyli.',
+        'Boli mnie, że tak wiele niegodziwych ludzi nigdy nie zostaje ukaranych.',
+        'Obracam na różne strony w swojej głowie to, co niedawno zrobiłem lub powiedziałem.',
+        'Smuci mnie, że ludzie myślą tylko o własnym interesie.',
+        'Boleję nad tym, jakimi egoistami jest większość ludzi.',
+        'Zastanawiam się dlaczego nie postąpiłem inaczej w pewnych sytuacjach.',
+        'Boli mnie myśl o tym, że nieuczciwi ludzie się bogacą.',
+        'Wyobrażam sobie co by było, gdybym inaczej się zachował w pewnych sytuacjach.',
+        'Myślę o tym, jaki niesprawiedliwy jest świat.',
+        'Na nowo przeżywam rozczarowania z przeszłości.',
+        'Powracam myślami do własnych postępków, których już nie można zmienić.',
+        'Gnębi mnie myśl, jak wiele podłości jest na świecie.',
+        'Trudno mi zaprzestać myślenia o rzeczach, które mi się nie udały. ',
+        'Trudno mi opędzić się od myśli, że w pewnych sytuacjach mogłem postąpić inaczej.'),
+        c('nigdy', 'rzadko', 'czasami', 'często', 'bardzo często'))
+    
+    ## CES-D
+    gui.show.instruction(
+        'Proszę zaznaczyć stwierdzenie, które najlepiej opisuje jak często czuł(a) się Pan/Pani lub zachowywał(a) w ten sposób w ciągu ostatniego tygodnia.
 ')
-
-cesd = gui.quest(c('Martwiły mnie rzeczy, które zazwyczaj mnie nie martwią.',
-            'Nie chciało mi się jeść, nie miałem(am) apetytu.',
-            'Czułem(am), że nie mogę pozbyć się chandry, smutku, nawet z pomocą rodziny i przyjaciół.',
-            'Wydawało mi się, że jestem gorszym człowiekiem niż inni ludzie.',
-            'Miałem(am) trudności ze skoncentrowaniem myśli na tym co robię.',
-            'Czułem(am) się przygnębiony(a).',
-            'Wszystko, co robiłem(am) przychodziło mi z trudem.',
-            'Patrzyłem(am) z nadzieją i ufnością w przyszłość.',
-            'Uważałem(am), że moje życie jest nieudane.',
-            'Czułem(am) lęk, obawy.',
-            'Żle sypiałem(am).',
-            'Czułem(am) się szczęśliwy(a).',
-            'Byłem(am) bardziej małomówny(a) niż zazwyczaj.',
-            'Czułem(am) się samotny(a).',
-            'Ludzie odnosili się do mnie nieprzyjaźnie.',
-            'Cieszyło mnie życie.',
-            'Miałem(am) napady płaczu.',
-            'Czułem(am) smutek.',
-            'Wydawało mi się, że ludzie mnie nie lubią.',
-            'Nic mi nie wychodziło.'),
-          c('< 1 dzień', '1-2 dni', '3-4 dni', '5-7 dni'))
-
-## SKU
-
-gui.show.instruction('Prosimy o ustosunkowanie się do podanych poniżej stwierdzeń zakreślając odpowiedź, która najlepiej opisuje Pana/Pani zachowania na co dzień. Przy każdej z pozycji testowych należy  wybrać jedną z odpowiedzi.')
-
-sku = gui.quest(c(
-    'Nie mogę skoncentrować się na trudnym zadaniu, kiedy wokół mnie jest hałas.',
-    'Jest mi trudno skupić uwagę, kiedy muszę się skoncentrować i rozwiązać jakiś problem.',
-    'To co dzieje się wokół rozprasza mnie, nawet jeśli pracuję nad czymś intensywnie.',
-    'Potrafię się skoncentrować nawet jeśli w pokoju gra muzyka.',
-    'Kiedy staram się skoncentrować, potrafię tak skupić uwagę, że nie zdaję sobie sprawy z tego, co dzieje się wokół mnie.',
-    'Łatwo rozpraszają mnie ludzie, którzy rozmawiają w miejscu, gdzie czytam lub się uczę.',
-    'Jest mi trudno pozbyć się rozpraszających mnie myśli, gdy staram się skupić na czymś uwagę.',
-    'Kiedy jestem czymś podekscytowany/a  jest mi trudno się skoncentrować.',
-    'Kiedy próbuję się skupić, nie zwracam uwagi na uczucie głodu i pragnienia.',
-    'Potrafię szybko przechodzić z jednego zadania do drugiego.',
-    'Potrzebuje trochę czasu, żeby naprawdę  zaangażować się w nowe zadanie.',
-    'Jest mi trudno jednocześnie słuchać i robić notatki, np. w czasie wykładu.',
-    'Kiedy zajdzie taka potrzeba, potrafię bardzo szybko zainteresować się nowym zagadnieniem.',
-    'Mogę z łatwością czytać lub pisać, kiedy rozmawiam przez telefon.',
-    'Trudno mi uczestniczyć w dwóch rozmowach jednocześnie.',
-    'Kiedy mam szybko wymyślić coś nowego, sprawia mi to trudność.',
-    'Potrafię z łatwością skupić uwagę na tym, co robiłem/am nawet, kiedy ktoś mi przeszkodził lub coś mnie  rozproszyło.',
-    'Kiedy rozprasza mnie jakaś myśl bez trudu potrafię ją odsunąć od siebie.',
-    'Z łatwością mogę wykonywać dwie czynności na przemian.',
-    'Jest mi trudno odejść od jednego sposobu myślenia o czymś i spojrzeć na to z innej strony.'),
-    c('nigdy', 'czasami', 'często', 'zawsze'))
-
-## Wydarzenia życiowe
-
-gui.show.instruction("Za chwilę pojawi się lista wydarzeń życiowych, które są przykre, trudne, nieprzyjemne.
+    cesd = gui.quest(c('Martwiły mnie rzeczy, które zazwyczaj mnie nie martwią.',
+        'Nie chciało mi się jeść, nie miałem(am) apetytu.',
+        'Czułem(am), że nie mogę pozbyć się chandry, smutku, nawet z pomocą rodziny i przyjaciół.',
+        'Wydawało mi się, że jestem gorszym człowiekiem niż inni ludzie.',
+        'Miałem(am) trudności ze skoncentrowaniem myśli na tym co robię.',
+        'Czułem(am) się przygnębiony(a).',
+        'Wszystko, co robiłem(am) przychodziło mi z trudem.',
+        'Patrzyłem(am) z nadzieją i ufnością w przyszłość.',
+        'Uważałem(am), że moje życie jest nieudane.',
+        'Czułem(am) lęk, obawy.',
+        'Żle sypiałem(am).',
+        'Czułem(am) się szczęśliwy(a).',
+        'Byłem(am) bardziej małomówny(a) niż zazwyczaj.',
+        'Czułem(am) się samotny(a).',
+        'Ludzie odnosili się do mnie nieprzyjaźnie.',
+        'Cieszyło mnie życie.',
+        'Miałem(am) napady płaczu.',
+        'Czułem(am) smutek.',
+        'Wydawało mi się, że ludzie mnie nie lubią.',
+        'Nic mi nie wychodziło.'),
+        c('< 1 dzień', '1-2 dni', '3-4 dni', '5-7 dni'))
+    
+    ## SKU
+    gui.show.instruction('Prosimy o ustosunkowanie się do podanych poniżej stwierdzeń zakreślając odpowiedź, która najlepiej opisuje Pana/Pani zachowania na co dzień. Przy każdej z pozycji testowych należy  wybrać jedną z odpowiedzi.')
+    sku = gui.quest(c(
+        'Nie mogę skoncentrować się na trudnym zadaniu, kiedy wokół mnie jest hałas.',
+        'Jest mi trudno skupić uwagę, kiedy muszę się skoncentrować i rozwiązać jakiś problem.',
+        'To co dzieje się wokół rozprasza mnie, nawet jeśli pracuję nad czymś intensywnie.',
+        'Potrafię się skoncentrować nawet jeśli w pokoju gra muzyka.',
+        'Kiedy staram się skoncentrować, potrafię tak skupić uwagę, że nie zdaję sobie sprawy z tego, co dzieje się wokół mnie.',
+        'Łatwo rozpraszają mnie ludzie, którzy rozmawiają w miejscu, gdzie czytam lub się uczę.',
+        'Jest mi trudno pozbyć się rozpraszających mnie myśli, gdy staram się skupić na czymś uwagę.',
+        'Kiedy jestem czymś podekscytowany/a  jest mi trudno się skoncentrować.',
+        'Kiedy próbuję się skupić, nie zwracam uwagi na uczucie głodu i pragnienia.',
+        'Potrafię szybko przechodzić z jednego zadania do drugiego.',
+        'Potrzebuje trochę czasu, żeby naprawdę  zaangażować się w nowe zadanie.',
+        'Jest mi trudno jednocześnie słuchać i robić notatki, np. w czasie wykładu.',
+        'Kiedy zajdzie taka potrzeba, potrafię bardzo szybko zainteresować się nowym zagadnieniem.',
+        'Mogę z łatwością czytać lub pisać, kiedy rozmawiam przez telefon.',
+        'Trudno mi uczestniczyć w dwóch rozmowach jednocześnie.',
+        'Kiedy mam szybko wymyślić coś nowego, sprawia mi to trudność.',
+        'Potrafię z łatwością skupić uwagę na tym, co robiłem/am nawet, kiedy ktoś mi przeszkodził lub coś mnie  rozproszyło.',
+        'Kiedy rozprasza mnie jakaś myśl bez trudu potrafię ją odsunąć od siebie.',
+        'Z łatwością mogę wykonywać dwie czynności na przemian.',
+        'Jest mi trudno odejść od jednego sposobu myślenia o czymś i spojrzeć na to z innej strony.'),
+        c('nigdy', 'czasami', 'często', 'zawsze'))
+    
+    ## Wydarzenia życiowe
+    gui.show.instruction("Za chwilę pojawi się lista wydarzeń życiowych, które są przykre, trudne, nieprzyjemne.
 
 Jeżeli w okresie ostatnich 3 miesięcy zdarzyło Ci się coś takiego, zaznacz przy nim, jak bardzo było ono przykre, na skali od 1 (mało przykre) do 5 (bardzo przykre).
 
 Jeżeli wymienione zdarzenie nie miało miejsca nie zaznaczaj nic na skali przy nim. Dla ułatwienia zdarzenia połączono w grupy odpowiadające poszczególnym obszarom życia.")
-
-wydarzenia = gui.quest(c('Poważna kłótnia/konflikt w rodzinie',
-            'Utrata pracy przez rodzica',
-            'Rozwód rodziców',
-            'Niesprawiedliwe oskarżenie ze strony rodziców',
-            'Patologie/ problemy/ przemoc w rodzinie',
-            'Śmierć brata lub siostry',
-            'Śmierć matki lub ojca',
-            'Poważna zmiana stanu zdrowia lub zachorowanie członka rodziny (choroby, wypadki, zaburzenia zachowania)',
-            'Niesprawiedliwa krytyka ze strony nauczyciela/wykładowcy',
-            'Nie zdany egzamin/test ',
-            'Poważne niepowodzenia w nauce ',
-            'Konflikt z nauczycielem/wykładowcą ',
-            'Inne kłopoty w nauce',
-            'Poważna kłótnia/ konflikt z kolegami',
-            'Koledzy/ koleżanki odwrócili się ode mnie',
-            'Utrata przyjaciół',
-            'Niesprawiedliwa krytyka ze strony kolegów/ koleżanek',
-            'Kompromitacja w oczach kolegów',
-            'Poważna choroba przyjaciółki/ przyjaciela',
-            'Śmierć przyjaciółki/przyjaciela',
-            'Poważna choroba',
-            'Poważny uraz fizyczny',
-            'Problemy zdrowotne',
-            'Choroba lub uraz fizyczny, które są mniej poważne',
-            'Poważny zabieg dentystyczny',
-            'Zdrada ze strony partnera',
-            'Poważna kłótnia z chłopakiem/ dziewczyną',
-            'Zerwanie z chłopakiem/ dziewczyną',
-            'Zawód miłosny',
-            'Inne kłopoty z partnerka lub partnerem',
-            'Problemy seksualne',
-            'Bycie ofiarą gwałtu',
-            'Bycie ofiarą napadu lub rabunku',
-            'Doświadczenie molestowania seksualnego',
-            'Drobny konflikt z prawem',
-            'Poważny konflikt z prawem',
-            'Pobyt w Izbie wytrzeźwień',
-            'Utrata wartościowego przedmiotu',
-            'Kłopoty finansowe   ',
-            'Udział w wypadku komunikacyjnym',
-            'Niechciana ciąża',
-            'Śmierć bliskiej osoby',
-            'Pożar w domu lub inny kataklizm',
-            'Porażka w konkursie lub zawodach',
-            'Poważne niepowodzenie w ważnej sprawie'),
-          paste(1:5), force.all = F, width = .8)
-} ## tylko dla nie-admina
-
-gui.show.instruction("Teraz rozpocznie się zadanie wykrywania słów innego koloru. Zadanie to składa się z serii prób, w trakcie których na ekranie komputera prezentowane są szybko, jedno po drugim, różne słowa. Większość prezentowanych słów ma kolor biały. Dwa spośród tych słów są zielone. Zadanie to polega na napisaniu, po każdej próbie, jakie było pierwsze i jakie było drugie słowo w kolorze zielonym.")
-
-## i = 1:5, żeby liczba prób zgadzała się z procedurą Kostera
-run.trials(trial.code, record.session = T,
-           expand.grid(t1em = c('neg', 'neu', 'pos'),
-                       t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5),
-           condition = 'default')
-
-## Zapisujemy dane kwestionariuszowe
-if(USER.DATA$name != 'admin'){
-    ## Zapamiętujemy dane kwestionariuszowe
-    db.connect()
+    wydarzenia = gui.quest(c('Poważna kłótnia/konflikt w rodzinie',
+        'Utrata pracy przez rodzica',
+        'Rozwód rodziców',
+        'Niesprawiedliwe oskarżenie ze strony rodziców',
+        'Patologie/ problemy/ przemoc w rodzinie',
+        'Śmierć brata lub siostry',
+        'Śmierć matki lub ojca',
+        'Poważna zmiana stanu zdrowia lub zachorowanie członka rodziny (choroby, wypadki, zaburzenia zachowania)',
+        'Niesprawiedliwa krytyka ze strony nauczyciela/wykładowcy',
+        'Nie zdany egzamin/test ',
+        'Poważne niepowodzenia w nauce ',
+        'Konflikt z nauczycielem/wykładowcą ',
+        'Inne kłopoty w nauce',
+        'Poważna kłótnia/ konflikt z kolegami',
+        'Koledzy/ koleżanki odwrócili się ode mnie',
+        'Utrata przyjaciół',
+        'Niesprawiedliwa krytyka ze strony kolegów/ koleżanek',
+        'Kompromitacja w oczach kolegów',
+        'Poważna choroba przyjaciółki/ przyjaciela',
+        'Śmierć przyjaciółki/przyjaciela',
+        'Poważna choroba',
+        'Poważny uraz fizyczny',
+        'Problemy zdrowotne',
+        'Choroba lub uraz fizyczny, które są mniej poważne',
+        'Poważny zabieg dentystyczny',
+        'Zdrada ze strony partnera',
+        'Poważna kłótnia z chłopakiem/ dziewczyną',
+        'Zerwanie z chłopakiem/ dziewczyną',
+        'Zawód miłosny',
+        'Inne kłopoty z partnerka lub partnerem',
+        'Problemy seksualne',
+        'Bycie ofiarą gwałtu',
+        'Bycie ofiarą napadu lub rabunku',
+        'Doświadczenie molestowania seksualnego',
+        'Drobny konflikt z prawem',
+        'Poważny konflikt z prawem',
+        'Pobyt w Izbie wytrzeźwień',
+        'Utrata wartościowego przedmiotu',
+        'Kłopoty finansowe   ',
+        'Udział w wypadku komunikacyjnym',
+        'Niechciana ciąża',
+        'Śmierć bliskiej osoby',
+        'Pożar w domu lub inny kataklizm',
+        'Porażka w konkursie lub zawodach',
+        'Poważne niepowodzenie w ważnej sprawie'),
+        paste(1:5), force.all = F, width = .8)
+    
+    ## Zapisujemy dane kwestionariuszowe
     panas = as.list(panas)
     names(panas) = paste('i', 1:length(panas), sep = '')
     db.create.data.table(panas, 'ablink_panas')
@@ -364,8 +354,18 @@ if(USER.DATA$name != 'admin'){
     db.create.data.table(wydarzenia, 'ablink_wydarzenia')
     wydarzenia$session_id = SESSION.ID
     db.insert.data(wydarzenia, 'ablink_wydarzenia')
-    db.disconnect()
-}
+    ## Zapisane wszystkie dane
+    db.mark.session.finished()
+} ## tylko dla nie-admina lub osoby, która jeszcze nie robiła kwestionariuszowych
+db.disconnect()
+
+gui.show.instruction("Teraz rozpocznie się zadanie wykrywania słów innego koloru. Zadanie to składa się z serii prób, w trakcie których na ekranie komputera prezentowane są szybko, jedno po drugim, różne słowa. Większość prezentowanych słów ma kolor biały. Dwa spośród tych słów są zielone. Zadanie to polega na napisaniu, po każdej próbie, jakie było pierwsze i jakie było drugie słowo w kolorze zielonym.")
+
+## i = 1:5, żeby liczba prób zgadzała się z procedurą Kostera
+run.trials(trial.code, record.session = T,
+           expand.grid(t1em = c('neg', 'neu', 'pos'),
+                       t1pos = 3:5, t2lag = c(2, 4, 6), i = 1:5),
+           condition = 'default')
 
 
 ## Dalszy etap procedury
