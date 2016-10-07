@@ -369,7 +369,7 @@ run.trials(trial.code, record.session = T,
 
 
 ## Dalszy etap procedury
-download.run.task("mcmtest")
+download.run.task("mcmtest2")
 
 gui.show.instruction("Dziękujemy, to już koniec eksperymentu. Prosimy pozostać na miejscu i zaczekać, aż osoba prowadząca badanie poinformuje o dalszym postępowaniu.")
 
