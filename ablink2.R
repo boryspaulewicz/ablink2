@@ -1,6 +1,3 @@
-##! TODO Liczba prób, sprawdzone słowa, sprawdzić, czy wszystkie słowa
-##się pojawiają, czy nie ma NA.
-
 ## Procedura: attentional blink a potem pamięciowe, w pamięciowym po
 ## 10 słów w każdej kategori (neg, neu, poz)
 
@@ -20,7 +17,7 @@ library(stringr)
 ## library(openxlsx)
 if(interactive())source('~/cs/code/r/tasks/task/task.R')
 ## db.connect('task')
-TASK.NAME <<- 'ablink'
+TASK.NAME <<- 'ablink2'
 
 FIXATION.TIME = 1000
 POST.FIXATION.TIME = 1000
@@ -60,6 +57,9 @@ WINDOW$set.visible(T)
 WINDOW$set.mouse.cursor.visible(T)
 
 FX = fixation(WINDOW, size = .02)
+
+######################################################################
+## ATTENTIONAL BLINK
 
 WORDS.I = list()
 INDICES = list()
