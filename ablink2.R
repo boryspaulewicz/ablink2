@@ -174,6 +174,16 @@ Za chwilę trzeba będzie wpisać dane osobowe: wiek, płeć oraz pseudonim. Pse
 
 gui.user.data()
 
+## Sprawdzamy, czy osoba o podanym identyfikatorze ma dane w bazie
+db.connect()
+mcm = db.query.csv('select * from mcmtest_data join session using(session_id);')
+used = db.query.csv(sprintf('select word, trial, session_id from mcmtest_data join session using(session_id) where name = "%s";', USER.DATA$name))
+if(dim(used) == 0){
+    db.disconnect()
+    gui.error.msg('Nie ma osoby o tym identyfikatorze w bazie danych dla zadania pamięciowego', quit.after = T)
+}
+db.disconnect()
+
 ######################################################################
 ## KWESTIONARIUSZE
 
